@@ -1,4 +1,4 @@
-Code and data accompanying our SVRHM'21 paper.
+Code and data accompanying our SVRHM'21 paper, "Category-orthogonal object features guide information processing in recurrent neural networks trained for object categorization" - https://arxiv.org/abs/2111.07898
 
 Requires tensorflow 1.13, python 3.7, scikit-learn, and pytorch 1.6.0 to be installed.
 
