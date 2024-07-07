@@ -4,25 +4,58 @@
 ############################# IMPORTING MODULES ##################################
 
 import torch
+from torchvision import datasets
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
-import torchvision
-import torchvision.transforms as transforms
-from torch.utils.data import Dataset, DataLoader
-from torch.utils.data.sampler import SubsetRandomSampler
 import numpy as np
-import tensorflow as tf
-import scipy
-from scipy.ndimage.interpolation import zoom
-from scipy.ndimage.interpolation import rotate
+from scipy.ndimage import zoom
+from scipy.ndimage import rotate
 from random import shuffle
-from sklearn import svm
-from scipy import ndimage
 
-from tensorflow.examples.tutorials.mnist import input_data
-mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
-fmnist = input_data.read_data_sets('fMNIST_data', one_hot=True)
+############################# GET DATASETS ##################################
+
+class MNISTData:
+    def __init__(self, images, labels):
+        self.images = images
+        self.labels = labels
+
+class MNIST:
+    def __init__(self, dataset_name='mnist'):
+        if dataset_name == 'mnist':
+            dataset = datasets.MNIST
+        elif dataset_name == 'fashionmnist':
+            dataset = datasets.FashionMNIST
+        else:
+            raise ValueError("dataset_name must be either 'mnist' or 'fashionmnist'")
+        
+        # Load datasets
+        train_dataset = dataset(root='./data', train=True, download=True)
+        test_dataset = dataset(root='./data', train=False, download=True)
+        
+        # Extract images and labels
+        train_images = train_dataset.data.numpy()
+        train_labels = self.one_hot(train_dataset.targets.numpy())
+        test_images = test_dataset.data.numpy()
+        test_labels = self.one_hot(test_dataset.targets.numpy())
+        
+        # Create validation set from the training set
+        val_size = 5000
+        train_size = len(train_images) - val_size
+        
+        train_images, val_images = train_images[:train_size], train_images[train_size:]
+        train_labels, val_labels = train_labels[:train_size], train_labels[train_size:]
+        
+        # Store datasets in MNIST-like structure
+        self.train = MNISTData(train_images, train_labels)
+        self.validation = MNISTData(val_images, val_labels)
+        self.test = MNISTData(test_images, test_labels)
+        
+    def one_hot(self, labels, num_classes=10):
+        return np.eye(num_classes)[labels]
+
+# Example usage:
+mnist = MNIST(dataset_name='mnist')
+fmnist = MNIST(dataset_name='fashionmnist')
 
 ############################# FUNCTIONS DEFINED ##################################
 
